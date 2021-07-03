@@ -1,0 +1,426 @@
+---
+title: "Week 12 IP"
+author: "Waiyego Mburu"
+date: "7/2/2021"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+## DATA UNDERSTANDING
+
+To identify which kind of individuals(profiles) are most likely to click on ads related to an online cryptography
+course if it were advertised on a blog given data on a related course that was advertised on the same blog
+some time ago.
+
+## METRIC OF SUCCESS
+
+If the analysis narrows down to a group of people who are highly likely to click on adverts for an online cryptography course, the initiative will be a success. The ability to come up with the best fits for these initiatives will be critical to their success.
+
+## CONTEXT
+
+A Kenyan entrepreneur has created an online cryptography course and would want to advertise it on her blog. She currently targets audiences originating from various countries. In the past, she ran ads to advertise a related course on the same blog and collected data in the process. She would now like to employ your services as a Data Science Consultant to help her identify which individuals are most likely to click on her ads. 
+
+## EXPERIMENTAL DESIGN
+
+* Import the relevant libraries that we will use in our analysis
+* Read and explore the dataset we will use for our project
+* Define the appropriateness of the available data with regards to the project
+* Find and deal with outliers, anomalies, and missing data within the dataset.
+* Perform univariate and bivariate analysis while recording our observations.
+
+## DATA RELEVANCE
+Our dataset is very relevant since it has most of the factors considered before rolling out of an advert. These factors include age group, site, traffic on the site.
+
+## READING THE DATASET
+```{r}
+advertising = read.csv("http://bit.ly/IPAdvertisingData")
+```
+
+##### Checking the first 6 entries
+```{r}
+head(advertising)
+```
+##### Checking the last 6 entries
+```{r}
+tail(advertising)
+```
+##### Checking the shape of our dataset
+```{r}
+dim(advertising)
+```
+
+##### Checking for duplicates and unique values
+```{r}
+duplicates <- advertising[duplicated(advertising),]
+duplicates
+```
+There are no duplicates in our dataset.
+
+##### Getting information on our datatypes
+```{r}
+str(advertising)
+```
+
+## Checking for null values per column
+```{r}
+colSums(is.na(advertising))
+```
+Our dataset has no missing data hence is complete and of good quality.
+
+## Checking for outliers in our numerical variables
+
+```{r}
+Time.onsite <- advertising$Daily.Time.Spent.on.Site
+Age <- advertising$Age
+Income <- advertising$Area.Income
+Internet <- advertising$Daily.Internet.Usage
+Topic <- advertising$Ad.Topic.Line
+City <- advertising$City
+Gender <- advertising$Male
+Country <- advertising$Country
+Clicked.on.Ad <- advertising$Clicked.on.Ad
+```
+
+```{r}
+boxplot(Time.onsite)
+```
+
+```{r}
+boxplot(Age)
+```
+
+```{r}
+boxplot(Income)
+```
+```{r}
+boxplot.stats(Income)$out
+```
+
+As can be seen the area income column has outliers. These outliers can be explained since there are other factors at play like demographics and varied income rates in different countries. Therefore, we do not remove the outliers.
+
+```{r}
+boxplot(Internet)
+```
+
+
+# Exploratory Data Analysis
+
+## Univariate Analysis
+
+### Measures of central Tendency (mean ,median,mode)
+
+#### **Mean**
+```{r}
+Time.onsite.mean = mean(Time.onsite)
+Time.onsite.mean
+```
+```{r}
+Age.mean = mean(Age)
+Age.mean
+```
+```{r}
+Income.mean = mean(Income)
+Income.mean
+```
+```{r}
+Internet.mean = mean(Internet)
+Internet.mean
+```
+
+#### **Mode**
+```{r}
+getmode = function(v){
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]  
+}
+```
+```{r}
+Time.onsite.mode = getmode(Time.onsite)
+Time.onsite.mode
+```
+```{r}
+Age.mode = getmode(Age)
+Age.mode
+```
+```{r}
+Income.mode = getmode(Income)
+Income.mode
+```
+```{r}
+Internet.mode = getmode(Internet)
+Internet.mode
+```
+```{r}
+Country.mode = getmode(Country)
+Country.mode
+```
+
+```{r}
+City.mode = getmode(City)
+City.mode
+```
+1. The most occurring age among our users is 31 years.
+2. The City with the most repeat users is Lisamouth.
+3. The country that’s most repeated is Czech Republic.
+4. Most of our respondents were female.
+
+#### **Median**
+```{r}
+Time.onsite.median = median(Time.onsite)
+Time.onsite.median
+```
+
+```{r}
+Age.median = median(Age)
+Age.median
+```
+
+```{r}
+Income.median = median(Income)
+Income.median
+```
+
+```{r}
+Internet.median = median(Internet)
+Internet.median
+```
+
+### Measures of dispersion(Variance, SD)
+
+#### **Variance**
+```{r}
+Time.onsite.variance = var(Time.onsite)
+Time.onsite.variance
+```
+```{r}
+Age.variance = var(Age)
+Age.variance
+```
+```{r}
+Income.variance = var(Income)
+Income.variance
+```
+```{r}
+Internet.variance = var(Internet)
+Internet.variance
+```
+
+#### **Standard Deviation**
+```{r}
+Time.onsite.standard.deviation = sd(Time.onsite)
+Time.onsite.standard.deviation
+```
+```{r}
+Age.standard.deviation = sd(Age)
+Age.standard.deviation
+```
+```{r}
+Income.standard.deviation = sd(Income)
+Income.standard.deviation
+```
+```{r}
+Internet.standard.deviation = sd(Internet)
+Internet.standard.deviation
+```
+
+### Range
+
+```{r}
+range(Time.onsite)
+```
+
+```{r}
+range(Age)
+```
+
+```{r}
+range(Income)
+```
+
+```{r}
+range(Internet)
+```
+1. The minimum time spent on the site is 32.60 while the maximum time spent on the site is 91.43
+2. The least age of the users is 19 while the largest age is 61
+3. Area income ranges between 13996.5 and 79484.6
+
+### Skewness and Kurtosis
+
+#### **Skewness**
+```{r}
+# Load the e1071 library that allows us to compute skewness and kurtosis
+library(e1071)
+```
+
+```{r}
+Time.onsite.skew = skewness(Time.onsite)
+Time.onsite.skew
+```
+
+```{r}
+Age.skew = skewness(Age)
+Age.skew
+```
+
+```{r}
+Income.skew = skewness(Income)
+Income.skew
+```
+
+```{r}
+Internet.skew = skewness(Internet)
+Internet.skew
+```
+
+#### **Kurtosis**
+
+```{r}
+Time.onsite.kurt = kurtosis(Time.onsite)
+Time.onsite.kurt
+```
+
+```{r}
+Age.kurt = kurtosis(Age)
+Age.kurt
+```
+
+```{r}
+Income.kurt = kurtosis(Income)
+Income.kurt
+```
+
+```{r}
+Internet.kurt = kurtosis(Internet)
+Internet.kurt
+```
+
+## Plotting Bar Charts of categorical variables
+
+```{r}
+Gender.distribution <- table(Gender)
+label <- c("Female","Male")
+barplot(Gender.distribution,names.arg = label,main = "Gender Distribution")
+```
+```{r}
+Clicked.on.Ad.frequency = table(Clicked.on.Ad)
+label <- c("No","Yes")
+barplot(Clicked.on.Ad.frequency,names.arg = label,main = "Clicked on AD Distribution")
+
+```
+```{r}
+# top 10 countries that accrue high average income
+avg.country = aggregate(Income, by = list(Country), FUN = mean)
+cou.top10 <- head(avg.country[order(avg.country$x,decreasing = TRUE), ],10)
+barplot(cou.top10$x,main = "COUNTRIES THAT ACCRUE HIGH INCOME",
+        xlab = "Area Income",
+        density = 80,
+        las = 1,
+        names = cou.top10$Group.1,
+        horiz = TRUE)
+```
+
+```{r}
+# Creating a dataframe for those who clicked the ad
+Ads <- advertising[Clicked.on.Ad == 1,]
+```
+
+```{r}
+## distribution for countries
+topcountries<- head(sort(table(Ads$Country),decreasing=TRUE),n=10)
+barplot(topcountries,las=1, main="Top Countries",horiz=TRUE)
+```
+
+```{r}
+hist(Time.onsite,xlab = "Daily Time Spent on Site", main = "Histogram of Daily Time Spent on Site")
+```
+
+```{r}
+hist(Age,xlab = "Age of User", main = "Histogram of Age of User")
+```
+
+```{r}
+hist(Ads$Age,xlab = "Age of User", main = "Histogram of Age of User")
+```
+
+```{r}
+hist(Income, xlab = "Area Income",main = "Histogram of Area Income")
+```
+```{r}
+hist(Internet,xlab = "Daily Internet Usage", main = "Histogram of Daily Internet Usage")
+```
+
+
+```{r}
+# Summary of measures of central tendency and dispersion
+library(psych)
+Description = describe(advertising)
+Description
+```
+
+## BIVARIATE ANALYSIS
+```{r}
+### Covariance between the Area_Income and Age and Clicked_on_Ad
+cov(Income, Clicked.on.Ad)
+```
+```{r}
+# Covariance between age and daily time on site
+cov(Age,Time.onsite)
+```
+```{r}
+### Covariance between the Age and Clicked on Ad
+cov(Age,Clicked.on.Ad)
+```
+
+```{r}
+## Covariance between the Age and Internet Usage
+cov(Age,Internet)
+```
+```{r}
+## Correlation between Age and Daily time onsite 
+cor(Age,Time.onsite)
+```
+```{r}
+## Correlation between age and internet
+cor(Age, Internet)
+```
+```{r}
+#Plotting the above correlation matrix as a heatmap of whole dataset
+#correlation
+res <- cor(advertising[1:4],method = "pearson")
+```
+
+```{r}
+#import library used to plot correlation matrix
+library(corrplot)
+```
+
+```{r}
+## corrplot 0.84 loaded
+corrplot(res, type = "lower", order = "hclust", tl.col = "red", tl.srt = 50)
+```
+
+```{r}
+plot(Time.onsite,Age, xlab ="Daily.Time.Spent.On.Site", ylab ="Age")
+
+```
+
+```{r}
+plot(Age,Income, xlab ="Age", ylab ="Income")
+```
+
+# Conclusion
+
+* We may deduce from the univariate data analysis that there were more females in our dataset than males.
+* The sample was balanced in that 500 people clicked on the adverts whereas 500 people did not.
+* The most people in our database were between the ages of 28 and 36. However, those that clicked on our ads are between the age of 35 and 45.
+* The Czech Republic had the most people in the sample. 
+* The city of Lisamouth had the highest number of people in the sample.
+* We can deduce from the bivariate data analysis that:
+* Age and daily time spent on the site have a negative covariance and association, which suggests that the older an individual is, the less time they spend on the site.
+* There is also a negative covariance and correlation between age and daily internet usage, implying that the younger a person is, the higher their internet usage is compared to an older person.
+
+# RECOMMENDATIONS
+
+Our target for ads are people aged between the ages of 35 and 45 since they click on ads more. However, we should also  make our ads more appealing to people between the ages of 28 and 36 since they're many. It’s also advisable to target the females more than their male counterparts since they are more in number.
+
